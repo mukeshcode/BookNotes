@@ -1,0 +1,22 @@
+<h1>LOGIN</h1>
+<form action="/login" method="POST">
+  <label for="username">Username</label>
+  <input type="text" id="username" name="username" />
+  <br />
+  <label for="password">Password</label>
+  <input type="password" id="password" name="password" />
+  <button type="submit" id="loginBtn">LOGIN</button>
+</form>
+
+<div class="message">
+  <% if (locals.message) { %>
+  <p><%= locals.message %></p>
+  <% } %>
+</div>
+<% if (locals.messages && messages.error) { %>
+<div class="error"><%= messages.error %></div>
+<% } %>
+<form action="/create" method="GET">
+  <label for="create">Create an account : </label>
+  <button type="submit">CREATE an ACCOUNT</button>
+</form>

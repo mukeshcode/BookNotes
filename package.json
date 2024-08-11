@@ -1,0 +1,24 @@
+{
+  "name": "books",
+  "version": "1.0.0",
+  "description": "A webpage for my book notes",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": " nodemon index.js"
+  },
+  "author": "Mukesh Kumar",
+  "license": "ISC",
+  "dependencies": {
+    "autoprefixer": "^10.4.19",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "nodemon": "^3.1.0",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
+    "pg": "^8.11.5"
+  }
+}

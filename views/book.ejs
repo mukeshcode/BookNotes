@@ -1,0 +1,161 @@
+<main>
+  <a href="/">Go to home</a>
+  <% if(locals.book) {%>
+    <h2><%= book.name %> - <%= book.author %></h2>
+    <img src="https://covers.openlibrary.org/b/isbn/<%= book.isbn %>-M.jpg" alt="cover photo" />
+    <p>Date Read : <%= book.date_read %></p>
+    <p>Rating : <%= book.rating %>/5</p>
+    <p>Summary</p>
+    <p>Amazon Link : <a href=<%= book.link %>>LINK</a></p>
+    <p>Completed : <%= book.complete %></p>
+  <% } %>
+
+  <% if(locals.notes) {%>
+    <% notes.forEach(function(note){ %>
+      <li>
+        <%= note.note_text %>
+        <button id="btn-del-note-<%=note.id%>" class="btn-del-note">X</button>
+        <button id="btn-update-note-<%=note.id%>" class="btn-update-note">Update</button>
+      </li>
+    <% }) %>
+  <% } %>
+
+  <article id="dialog-addNote-box" style="display: none; background-color: #008000; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 1rem;">
+    <form action="/book/<%=book.id%>/addNote" method="POST">
+      <input type="text" name="note_text" id="note_text" placeholder="Your note text">
+      <br>
+      <button id="btn-addNote-yes" type="submit">CREATE</button>
+      <button id="btn-addNote-no" type="button">CANCEL</button>
+    </form>
+  </article>
+
+  <article id="dialog-updateNote-box" style="background-color: skyblue; display: none; padding: 1rem; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);">
+    <input type="text" name="note_textbox" id="note_textbox">
+    <br>
+    <button id="btn-updateNote-yes">UPDATE</button>
+    <button id="btn-updateNote-no">CANCEL</button>
+  </article>
+
+  <article id="dialog-deleteNote-box" style="background-color: red; display: none; padding: 1rem; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);"> 
+    <h3>SURE</h3>
+    <button type="button" id="btnDelNoteYes">YES</button>
+    <button type="button" id="btnDelNoteNo">NO</button>
+  </article>
+
+  <button id="btn-add-note">Add a note</button>
+
+  <script>
+    // Adding a new Note section
+    const btnAddNote = document.getElementById("btn-add-note");
+    const btnAddNoteYes = document.getElementById("btn-addNote-yes");
+    const btnAddNoteNo = document.getElementById("btn-addNote-no");
+    const bookId = <%= locals.book ? book.id : "" %>;
+
+    btnAddNote.addEventListener("click", showCreateNoteDialog);
+    btnAddNoteYes.addEventListener("click", hideCreateNoteDialog);
+    btnAddNoteNo.addEventListener("click", hideCreateNoteDialog);
+
+
+    function showCreateNoteDialog(){
+      document.getElementById("dialog-addNote-box").style.display = "block";
+    }
+
+    function hideCreateNoteDialog(){
+      document.getElementById("dialog-addNote-box").style.display = "none";
+    }
+
+    function createNote(){
+      console.log("I am going to craete note");
+    }
+
+    // Updating a note section
+    const btnUpdate = document.getElementsByClassName("btn-update-note"); 
+    const btnUpdateYes = document.getElementById("btn-updateNote-yes");
+    const btnUpdateNo = document.getElementById("btn-updateNote-no");
+    let noteId = -1;
+    for(const btn of btnUpdate)
+      btn.addEventListener("click", showUpdateDialogBox);
+
+    btnUpdateNo.addEventListener("click", hideUpdateDialogBox);
+    btnUpdateYes.addEventListener("click", updateNote);
+
+
+    function showUpdateDialogBox(event){
+      document.getElementById("dialog-updateNote-box").style.display="block";
+      const elemId = event.target.id;
+      const splitId = elemId.split('-');
+      // id of the note in the note table
+      noteId = splitId[splitId.length - 1];
+      const note_text = <%- JSON.stringify(notes) %>.find((note) => note.id == noteId).note_text;
+      console.log(note_text);
+      
+      const inputBox = document.getElementById("note_textbox");
+      inputBox.value = String(note_text);
+    }
+
+    function hideUpdateDialogBox(){
+      document.getElementById("dialog-updateNote-box").style.display="none";
+    }
+
+    async function updateNote(){
+      if(noteId == -1){
+        alert("An error occurred");
+      }else{
+        const formData = new URLSearchParams();
+        formData.append("id", noteId);
+        formData.append("note_text", document.getElementById("note_textbox").value);
+
+        const result = await fetch("/updateNote", {
+          method : "POST",
+          body : formData
+        })
+
+        if(result.ok)
+          window.location.href = "/book/<%=book.id%>";
+
+      }
+      
+      hideUpdateDialogBox();
+    }
+
+    // Deleting a note section
+    let delNoteId = -1;
+    const btnDelNote = document.getElementsByClassName("btn-del-note");
+    const btnDelNoteYes = document.getElementById("btnDelNoteYes");
+    const btnDelNoteNo = document.getElementById("btnDelNoteNo");
+
+    for(let btn of btnDelNote)
+      btn.addEventListener("click", showDeleteNoteDialog);
+
+    btnDelNoteNo.addEventListener("click", hideDelNoteDialog);
+    btnDelNoteYes.addEventListener("click", deleteNote);
+
+    function showDeleteNoteDialog(event){
+      const btnId = event.target.id;
+      const splitId = btnId.split('-');
+      delNoteId = splitId[splitId.length - 1];
+      
+      document.getElementById("dialog-deleteNote-box").style.display = "block";
+    }
+
+    function hideDelNoteDialog(){
+      document.getElementById("dialog-deleteNote-box").style.display = "none";
+    }
+
+    async function deleteNote(){
+      const res = await fetch('/deleteNote?' + new URLSearchParams({note_id: delNoteId,}), {
+        method : "GET"
+      }
+      );
+      console.log(res);
+
+      hideDelNoteDialog();
+
+      if(res.ok)
+        window.location.href = "/book/<%=book.id%>";
+
+    }
+
+  </script>
+
+</main>

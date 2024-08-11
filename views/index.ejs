@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Books</title>
+    <link rel="stylesheet" href="./styles/style.css" />
+  </head>
+  <body class="">
+    <header class="">
+      <% if(locals.username) {%>
+      <h3><%= username %></h3>
+      <% } %>
+      <hr />
+      <h1>
+        Books I've Read :
+        <small
+          ><small><a href="/addBookForm">Add MORE</a></small></small
+        >
+      </h1>
+      <p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque eligendi
+        cum recusandae optio quod fuga provident libero dolore inventore
+        dignissimos perspiciatis voluptas, accusantium, nulla officia.
+      </p>
+    </header>
+
+    <main>
+      <% if(locals.booksData) {%> <% booksData.forEach(function(book){%>
+      <article class="book">
+        <h2><%= book.name %> - <%= book.author %></h2>
+        <img
+          src="https://covers.openlibrary.org/b/isbn/<%= book.isbn %>-M.jpg"
+          alt="cover photo"
+        />
+        <p>Date Read : <%= book.date_read %></p>
+        <p>Rating : <%= book.rating %>/5</p>
+        <p>Summary</p>
+        <p>
+          Notes link : <a href="/book/<%= book.id %>">My notes</a> Amazon Link :
+          <a href="<%=book.link%>">LINK</a>
+        </p>
+        <p>Completed : <%= book.complete %></p>
+        <a href="/updateBookForm/<%=book.id%>">Update Info</a>
+        <button id="btn-del-book-<%=book.id%>" class="btn-del-book">
+          Delete Book
+        </button>
+      </article>
+      <%})%> <% } %>
+
+      <article
+        class="dialog-delete-book"
+        id="dialog-delete-book"
+        style="
+          background-color: red;
+          padding: 1rem;
+          color: white;
+          display: none;
+          position: fixed;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+        "
+      >
+        <h3>Delete book</h3>
+        <!-- <form action="/deleteBook/" method="POST"> -->
+        <button type="button" value="YES" name="deleteBook" id="btnYes">
+          YES
+        </button>
+        <button type="button" value="NO" name="deleteBook" id="btnNo">
+          NO
+        </button>
+        <!-- </form> -->
+      </article>
+      <section>
+        <form action="/logout" method="POST">
+          <button type="submit">LOGOUT</button>
+        </form>
+      </section>
+    </main>
+
+    <footer>
+      <hr />
+      <small>No copyright. All YOURS.</small>
+    </footer>
+
+    <script>
+      const btnsDelete = document.getElementsByClassName("btn-del-book");
+      const dialogDeleteBox = document.getElementById("dialog-delete-book");
+      const btnYes = document.getElementById("btnYes");
+      const btnNo = document.getElementById("btnNo");
+      let bookId = null;
+
+      // Attaching event listeners
+      for (const btn of btnsDelete)
+        btn.addEventListener("click", showDialogBox);
+
+      btnNo.addEventListener("click", hideDialogBox);
+      btnYes.addEventListener("click", deleteBook);
+
+      function showDialogBox(event) {
+        const id = event.target.id;
+        const splitId = id.split("-");
+        bookId = splitId[splitId.length - 1];
+        dialogDeleteBox.style.display = "block";
+      }
+
+      function hideDialogBox() {
+        dialogDeleteBox.style.display = "none";
+      }
+
+      async function deleteBook() {
+        console.log("Going inside");
+        if (bookId !== null) {
+          console.log("I will delete the book with id", bookId);
+        }
+
+        const formData = new URLSearchParams();
+        formData.append("bookId", bookId);
+
+        const res = await fetch(`/deleteBook`, {
+          method: "POST",
+          body: formData,
+        });
+
+        hideDialogBox();
+
+        if (res.ok) window.location.href = "/";
+      }
+    </script>
+  </body>
+</html>

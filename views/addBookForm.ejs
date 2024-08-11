@@ -1,0 +1,24 @@
+
+<main>
+  <form action="/addBook" method="POST">
+    <input type="text" placeholder="Book Name" name="name" id="name" required>
+    <br>
+    <input type="date" placeholder="Date read" name="date_read" id="date_read">
+    <br>
+    <input type="text" placeholder="ISBN No. " name="isbn" id="isbn" required>
+    <br>
+    <input type="number" placeholder="Ratings" name="rating" id="rating" min="1" max="5">
+    <br>
+    <input type="text" placeholder="Author" name="author" id="author" required>
+    <br>
+    <input type="text" placeholder="Amazon|Flipkart link" name="link" id="link">
+    <br>
+    Complete
+    <input type="radio" id="complete_true" name="complete" value="true" required>
+    <label for="complete_true">Yes</label>
+    <input type="radio" id="complete_false" name="complete" value="false" required>
+    <label for="complete_false">No</label>
+    <br>
+    <button type="submit">ADD book</button>
+  </form> 
+</main>
